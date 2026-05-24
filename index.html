@@ -523,8 +523,32 @@
     .cal-detail-title { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 5px; }
     .cal-detail-meta { font-size: 11px; color: var(--text-muted); }
 
+    /* ── TABLET ── */
+    @media (min-width: 768px) and (max-width: 1023px) {
+      html, body { overflow-y: auto; overflow-x: hidden; }
+      .desktop {
+        height: auto;
+        min-height: calc(100vh - 58px);
+        padding: 32px 24px 28px;
+        gap: 24px;
+      }
+      .desktop-logo { flex: none; }
+      #logo-large { width: clamp(160px, 28vw, 280px); }
+      .desktop-folders { gap: 16px; }
+      .folder-placeholder { display: none; }
+      .folder-name { font-size: 12px; }
+      .folder-sub  { font-size: 10px; }
+      .finder {
+        width: calc(100vw - 40px);
+        max-height: calc(100vh - 80px);
+        top: 68px;
+        left: 20px;
+        transform: none;
+      }
+    }
+
     /* ── MOBILE ── */
-    @media (max-width: 768px) {
+    @media (max-width: 767px) {
       html, body { overflow-y: auto; overflow-x: hidden; }
       .desktop {
         height: auto;
@@ -1100,12 +1124,15 @@
       setEye('eye-right', ER_REST.x, ER_REST.y);
     }
 
-    ['folder-aroma','folder-etch'].forEach(id => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.addEventListener('mouseenter', () => lookAt(el));
-      el.addEventListener('mouseleave', resetEyes);
-    });
+    // Only attach hover tracking on devices that support real hover (desktop)
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      ['folder-aroma','folder-etch'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('mouseenter', () => lookAt(el));
+        el.addEventListener('mouseleave', resetEyes);
+      });
+    }
   })();
 
   // ── SCROLL-HIDE NAV ──
