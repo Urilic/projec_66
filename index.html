@@ -523,8 +523,32 @@
     .cal-detail-title { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 5px; }
     .cal-detail-meta { font-size: 11px; color: var(--text-muted); }
 
+    /* ── TABLET ── */
+    @media (min-width: 768px) and (max-width: 1023px) {
+      html, body { overflow-y: auto; overflow-x: hidden; }
+      .desktop {
+        height: auto;
+        min-height: calc(100vh - 58px);
+        padding: 32px 24px 28px;
+        gap: 24px;
+      }
+      .desktop-logo { flex: none; }
+      #logo-large { width: clamp(160px, 28vw, 280px); }
+      .desktop-folders { gap: 16px; }
+      .folder-placeholder { display: none; }
+      .folder-name { font-size: 12px; }
+      .folder-sub  { font-size: 10px; }
+      .finder {
+        width: calc(100vw - 40px);
+        max-height: calc(100vh - 80px);
+        top: 68px;
+        left: 20px;
+        transform: none;
+      }
+    }
+
     /* ── MOBILE ── */
-    @media (max-width: 768px) {
+    @media (max-width: 767px) {
       html, body { overflow-y: auto; overflow-x: hidden; }
       .desktop {
         height: auto;
@@ -587,8 +611,8 @@
       <img src="logo-no-text.svg" alt="project 66" class="menubar-logo" style="height:11px;" />
       <div class="menubar-nav">
         <span onclick="openFinder('calendar')">Calendar</span>
-        <span onclick="openFinder('contact')">Contact Us</span>
         <span onclick="openFinder('about')">About</span>
+        <span onclick="openFinder('contact')">Contact Us</span>
       </div>
     </div>
     <span class="menubar-time" id="clock"></span>
@@ -629,11 +653,7 @@
           <div class="f-back"></div>
           <div class="f-tab"></div>
           <div class="f-front">
-            <div class="f-front-placeholder" style="background:#888;">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5">
-                <path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
-              </svg>
-            </div>
+            <img src="images/etching.jpg" alt="Etch" />
             <div class="f-label-overlay"><span>Etch</span></div>
           </div>
         </div>
@@ -700,18 +720,18 @@
         </div>
       </div>
       <div class="finder-content">
-        <div class="fc-hero" style="background:#8a9aa4;">
-          <div class="fc-hero-placeholder">photo coming soon</div>
+        <div class="fc-hero" style="background:#3a2e20;">
+          <img src="images/etching.jpg" alt="Etch 001" style="width:100%;height:100%;object-fit:cover;display:block;" />
           <div class="fc-status-badge badge-soon">Coming Soon</div>
         </div>
         <div class="fc-body">
           <div class="fc-series">Etch series · No. 001</div>
           <div class="fc-title">Copper Pendant Etching</div>
           <div class="info-row"><span class="info-label">Sponsor</span><span class="info-val"><span class="inline-badge badge-tbd">Open</span></span></div>
-          <div class="info-row"><span class="info-label">Ticket</span><span class="info-val">$66 · free w/ sponsor</span></div>
+          <div class="info-row"><span class="info-label">Ticket</span><span class="info-val">$66</span></div>
           <div class="info-row"><span class="info-label">Date</span><span class="info-val">TBD</span></div>
           <div class="info-row"><span class="info-label">Location</span><span class="info-val">New York, NY</span></div>
-          <a href="#" class="rsvp-btn disabled">Waitlist opening soon →</a>
+          <a href="mailto:hello@project-66.fun?subject=Etch%20001%20Waitlist&body=Hi%2C%20I%27d%20like%20to%20join%20the%20waitlist%20for%20Etch%20001%20%E2%80%94%20Copper%20Pendant%20Etching." class="rsvp-btn">Join Waitlist →</a>
         </div>
       </div>
     </div>
@@ -819,28 +839,14 @@
           <div class="connect-card">
             <div>
               <div class="connect-name">General Inquiries</div>
-              <div class="connect-role">hello@project66.co</div>
+              <div class="connect-role">hello@project-66.fun</div>
             </div>
             <span class="inline-badge badge-org">email</span>
           </div>
           <div class="connect-card">
             <div>
-              <div class="connect-name">Sponsorship</div>
-              <div class="connect-role">sponsor@project66.co</div>
-            </div>
-            <span class="inline-badge badge-sponsor">sponsor</span>
-          </div>
-          <div class="connect-card">
-            <div>
-              <div class="connect-name">Instagram</div>
-              <div class="connect-role">@project66.nyc</div>
-            </div>
-            <span class="inline-badge badge-org">social</span>
-          </div>
-          <div class="connect-card">
-            <div>
               <div class="connect-name">小红书</div>
-              <div class="connect-role">project 66</div>
+              <div class="connect-role">project_66</div>
             </div>
             <span class="inline-badge badge-org">social</span>
           </div>
@@ -870,23 +876,22 @@
         </div>
       </div>
       <div class="finder-content">
-        <div class="fc-hero" style="background: linear-gradient(135deg, #222222, #666666);">
-          <div class="fc-hero-placeholder" style="flex-direction:column; gap:6px;">
-            <span style="font-family: var(--font-serif); font-size:1.4rem; color:rgba(255,255,255,0.9); letter-spacing:-0.01em;">project 66</span>
-            <span style="font-size:9px; letter-spacing:0.18em; color:rgba(255,255,255,0.55);">NEW YORK</span>
-          </div>
+        <div class="fc-hero" style="background:#1a1410;">
+          <img src="images/about.jpg" alt="project 66" style="width:100%;height:100%;object-fit:cover;object-position:center 30%;display:block;" />
         </div>
         <div class="fc-body">
           <div class="fc-series">Est. 2026 · New York, NY</div>
           <div class="fc-title">A community for curious makers.</div>
           <div class="info-row" style="display:block; padding:10px 0; border:none;">
             <span class="info-label" style="display:block; line-height:1.9; font-size:11px; color:var(--text); letter-spacing:0.03em;">
-              project 66 hosts intimate, hands-on experiences — from scent workshops to copper etching — where people slow down, make something real, and connect with others who care about craft.
+              project 66 is a New York-based gathering space for people who miss making real things.<br><br>
+              We host hands-on workshops, experimental sessions, and low-pressure creative nights — from fragrance labs to metal etching and everything in between.<br><br>
+              No networking energy. No "creative entrepreneur" panels.<br>
+              Just people making things together.
             </span>
           </div>
           <div class="info-row"><span class="info-label">Series</span><span class="info-val">Aroma · Etch</span></div>
           <div class="info-row"><span class="info-label">Location</span><span class="info-val">New York, NY</span></div>
-          <div class="info-row"><span class="info-label">Ticket</span><span class="info-val">$66 · free w/ sponsor</span></div>
         </div>
       </div>
     </div>
@@ -1100,12 +1105,15 @@
       setEye('eye-right', ER_REST.x, ER_REST.y);
     }
 
-    ['folder-aroma','folder-etch'].forEach(id => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.addEventListener('mouseenter', () => lookAt(el));
-      el.addEventListener('mouseleave', resetEyes);
-    });
+    // Only attach hover tracking on devices that support real hover (desktop)
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      ['folder-aroma','folder-etch'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('mouseenter', () => lookAt(el));
+        el.addEventListener('mouseleave', resetEyes);
+      });
+    }
   })();
 
   // ── SCROLL-HIDE NAV ──
