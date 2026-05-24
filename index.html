@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>project 66</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #ffffff;
+      --bg-window: #ffffff;
+      --bg-sidebar: #f5f5f5;
+      --bg-titlebar: #eeeeee;
+      --bg-dark: #000000;
+      --text: #000000;
+      --text-muted: #666666;
+      --text-faint: #999999;
+      --border: rgba(0,0,0,0.12);
+      --border-light: rgba(0,0,0,0.07);
+      --folder-aroma: #444444;
+      --folder-etch: #888888;
+      --folder-connects: #aaaaaa;
+      --font-sans: 'Inter', sans-serif;
+      --font-serif: 'Inter', sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    /* ── TICKER ── */
+    .ticker {
+      background: var(--bg-dark);
+      height: 30px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 21;
+    }
+    .ticker-track {
+      display: flex;
+      white-space: nowrap;
+      animation: scroll-ticker 28s linear infinite;
+    }
+    .ticker-track:hover { animation-play-state: paused; }
+    @keyframes scroll-ticker {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .ticker-item {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #d0ccc4;
+      padding: 0 2.5rem;
+    }
+    .ticker-item .hi { color: #ffffff; font-weight: 600; }
+    .ticker-item .sep { color: #555; margin: 0 0.4rem; }
+
+    /* ── MENUBAR ── */
+    .menubar {
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(12px);
+      border-bottom: 0.5px solid var(--border);
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      position: sticky;
+      top: 30px;
+      z-index: 20;
+      transition: transform 0.28s ease;
+    }
+    .menubar.nav-hidden { transform: translateY(-100%); }
+    .menubar-left { display: flex; align-items: center; gap: 18px; }
+    .menubar-logo img { height: 13px; width: auto; display: block; }
+    .menubar-nav { display: flex; gap: 18px; }
+    .menubar-nav span {
+      font-size: 11px;
+      letter-spacing: 0.07em;
+      color: var(--text);
+      cursor: default;
+      opacity: 0.7;
+    }
+    .menubar-nav span:hover { opacity: 1; }
+    .menubar-time {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--text);
+    }
+
+    /* ── DESKTOP ── */
+    .desktop {
+      height: calc(100vh - 58px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 20px;
+      gap: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .desktop-logo {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #logo-large {
+      width: clamp(180px, 30vw, 380px);
+      height: auto;
+      max-height: 100%;
+      display: block;
+    }
+    #logo-large circle {
+      transition: cx 0.18s ease, cy 0.18s ease;
+    }
+    .desktop-folders {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      flex-shrink: 0;
+      align-items: flex-start;
+    }
+    .folder-placeholder { flex: 1; }
+
+    /* ── FOLDER (large card, proportional) ── */
+    .folder {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      user-select: none;
+      min-width: 0;
+    }
+    .folder:hover .folder-shell { transform: scale(1.02); }
+    .folder-shell {
+      width: 100%;
+      aspect-ratio: 3/2;
+      position: relative;
+      transition: transform 0.13s ease;
+    }
+    .f-back {
+      position: absolute;
+      top: 18px; left: 0; right: 0; bottom: 0;
+      border-radius: 4px 8px 6px 6px;
+    }
+    .f-tab {
+      position: absolute;
+      top: 0; left: 16px;
+      width: clamp(50px, 28%, 140px); height: 24px;
+      border-radius: 6px 6px 0 0;
+    }
+    .f-front {
+      position: absolute;
+      top: 24px; left: 0; right: 0; bottom: 0;
+      border-radius: 3px 3px 6px 6px;
+      overflow: hidden;
+    }
+    .f-front img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .f-front-placeholder {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .f-label-overlay {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 22px;
+      background: linear-gradient(to top, rgba(0,0,0,0.55), transparent);
+      display: flex; align-items: flex-end;
+      padding: 0 6px 4px;
+    }
+    .f-label-overlay span {
+      font-size: 8px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #fff;
+    }
+    .folder-name {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: var(--text);
+      font-weight: 500;
+      text-align: center;
+    }
+    .folder-sub {
+      font-size: 9px;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      text-align: center;
+      margin-top: -3px;
+    }
+
+    /* aroma */
+    .folder-aroma .f-back  { background: var(--folder-aroma); }
+    .folder-aroma .f-tab   { background: var(--folder-aroma); }
+    /* etch */
+    .folder-etch .f-back   { background: var(--folder-etch); }
+    .folder-etch .f-tab    { background: var(--folder-etch); }
+    /* connects */
+    .folder-connects .f-back { background: var(--folder-connects); }
+    .folder-connects .f-tab  { background: var(--folder-connects); }
+    .folder-connects .f-front { background: #c8b8d8; display: flex; align-items: center; justify-content: center; }
+
+    /* folder group divider */
+    .folder-divider {
+      width: 0.5px;
+      background: rgba(0,0,0,0.15);
+      height: 80px;
+      align-self: center;
+      margin: 0 4px;
+    }
+
+    /* ── OVERLAY ── */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+    }
+    .overlay.open { display: block; }
+
+    /* ── FINDER WINDOW ── */
+    .finder {
+      display: none;
+      position: fixed;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 580px;
+      max-height: calc(100vh - 100px);
+      background: var(--bg-window);
+      border-radius: 12px;
+      border: 0.5px solid rgba(0,0,0,0.22);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.12);
+      overflow: hidden;
+      z-index: 40;
+      flex-direction: column;
+    }
+    .finder.open { display: flex; }
+
+    .finder-titlebar {
+      background: var(--bg-titlebar);
+      height: 38px;
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 8px;
+      border-bottom: 0.5px solid var(--border);
+      flex-shrink: 0;
+    }
+    .wdot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .wdot.red    { background: #ff5f57; }
+    .wdot.yellow { background: #febc2e; }
+    .wdot.green  { background: #28c840; }
+    .wdot.red:hover { background: #e04040; }
+    .finder-title {
+      flex: 1;
+      text-align: center;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: #3a3a3a;
+      margin-left: -42px;
+    }
+
+    .finder-body {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+      max-height: calc(100vh - 138px);
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 154px;
+      background: var(--bg-sidebar);
+      border-right: 0.5px solid var(--border);
+      padding: 10px 0;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+    .sb-section {
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #8a8a8a;
+      padding: 8px 13px 4px;
+    }
+    .sb-item {
+      font-size: 11px;
+      color: #3a3a3a;
+      padding: 6px 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: background 0.1s;
+    }
+    .sb-item:hover { background: rgba(0,0,0,0.05); }
+    .sb-item.active { background: rgba(0,0,0,0.1); }
+    .sb-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .sb-badge {
+      margin-left: auto;
+      font-size: 8px;
+      letter-spacing: 0.1em;
+      padding: 2px 6px;
+      border-radius: 2px;
+      text-transform: uppercase;
+    }
+    .sb-badge.upcoming { background: #000; color: #fff; }
+    .sb-badge.past     { background: #e8e8e8; color: #666; }
+
+    /* ── FINDER CONTENT ── */
+    .finder-content {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .fc-hero {
+      width: 100%;
+      height: 140px;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+      background: #c8b89a;
+    }
+    .fc-hero img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .fc-hero-placeholder {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; letter-spacing: 0.12em;
+      color: rgba(255,255,255,0.5);
+    }
+    .fc-status-badge {
+      position: absolute;
+      top: 10px; right: 10px;
+      font-size: 8px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 2px;
+    }
+    .badge-upcoming { background: #000; color: #fff; }
+    .badge-soon     { background: #333; color: #fff; }
+    .badge-free     { background: #000; color: #fff; }
+    .badge-tbd      { background: #e8e8e8; color: #666; }
+    .badge-past     { background: #e8e8e8; color: #888; }
+
+    .fc-body { padding: 16px 18px; }
+    .fc-series {
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .fc-title {
+      font-family: var(--font-sans);
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 0;
+      border-bottom: 0.5px solid var(--border-light);
+      font-size: 11px;
+    }
+    .info-row:last-of-type { border: none; }
+    .info-label { color: var(--text-muted); letter-spacing: 0.08em; }
+    .info-val   { color: var(--text); letter-spacing: 0.04em; }
+    .inline-badge {
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 2px;
+    }
+
+    .rsvp-btn {
+      display: block;
+      width: 100%;
+      margin-top: 16px;
+      padding: 11px;
+      background: var(--bg-dark);
+      color: #f0ece4;
+      font-family: var(--font-sans);
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      text-align: center;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .rsvp-btn:hover { background: #333; }
+    .rsvp-btn.disabled {
+      background: #aaa;
+      cursor: default;
+      pointer-events: none;
+    }
+
+    /* connects cards */
+    .connect-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 11px 0;
+      border-bottom: 0.5px solid var(--border-light);
+    }
+    .connect-card:last-child { border: none; }
+    .connect-name {
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+    .connect-role {
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 0.07em;
+    }
+    .badge-org      { background: #000; color: #fff; }
+    .badge-sponsor  { background: #444; color: #fff; }
+    .badge-open     { background: #e8e8e8; color: #666; opacity: 0.6; }
+
+    /* ── CALENDAR GRID ── */
+    .cal-grid-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 18px 10px;
+      border-bottom: 0.5px solid var(--border);
+      flex-shrink: 0;
+    }
+    .cal-month-label { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; color: var(--text); }
+    .cal-nav-btn {
+      background: none; border: none; font-size: 20px; line-height: 1;
+      color: var(--text-muted); cursor: pointer; padding: 2px 8px; border-radius: 4px;
+    }
+    .cal-nav-btn:hover { background: #f0f0f0; color: var(--text); }
+    .cal-days-header {
+      display: grid; grid-template-columns: repeat(7, 1fr);
+      border-bottom: 0.5px solid var(--border); flex-shrink: 0;
+    }
+    .cal-day-name {
+      font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--text-faint); text-align: center; padding: 7px 0;
+    }
+    .cal-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr);
+      grid-auto-rows: 68px; flex-shrink: 0;
+    }
+    .cal-cell {
+      border-right: 0.5px solid var(--border-light);
+      border-bottom: 0.5px solid var(--border-light);
+      padding: 5px 6px;
+    }
+    .cal-cell:nth-child(7n) { border-right: none; }
+    .cal-cell-empty { border-right: 0.5px solid var(--border-light); border-bottom: 0.5px solid var(--border-light); }
+    .cal-cell-empty:nth-child(7n) { border-right: none; }
+    .cal-cell-num {
+      font-size: 11px; font-weight: 400; color: var(--text-muted);
+      width: 22px; height: 22px; display: flex; align-items: center;
+      justify-content: center; border-radius: 50%; margin-bottom: 3px;
+    }
+    .cal-cell.today .cal-cell-num { background: var(--text); color: #fff; font-weight: 600; }
+    .cal-cell.has-event { cursor: pointer; }
+    .cal-cell.has-event:hover { background: #fafafa; }
+    .cal-cell.selected { background: #f5f5f5; }
+    .cal-event-chip {
+      font-size: 9px; font-weight: 500; background: var(--text); color: #fff;
+      border-radius: 2px; padding: 2px 5px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      letter-spacing: 0.02em;
+    }
+    .cal-detail-panel {
+      border-top: 0.5px solid var(--border);
+      padding: 14px 18px 16px;
+      display: none; flex-shrink: 0;
+    }
+    .cal-detail-panel.open { display: flex; align-items: center; gap: 14px; }
+    .cal-detail-text { flex: 1; min-width: 0; }
+    .cal-detail-eyebrow { font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
+    .cal-detail-title { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 5px; }
+    .cal-detail-meta { font-size: 11px; color: var(--text-muted); }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      html, body { overflow-y: auto; overflow-x: hidden; }
+      .desktop {
+        height: auto;
+        min-height: calc(100vh - 58px);
+        padding: 12px;
+        justify-content: flex-start;
+        gap: 0;
+      }
+      .desktop-logo {
+        width: 100%;
+        padding: 32px 0 28px;
+        flex: none;
+      }
+      #logo-large { width: clamp(140px, 50vw, 260px); }
+      .desktop-folders {
+        width: 100%;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .folder {
+        width: 100%;
+        height: 70vw;
+      }
+      .folder-shell {
+        width: 100%;
+        height: unset;
+        flex: 1;
+      }
+      .f-back { top: 18px; height: auto; bottom: 0; }
+      .f-tab  { width: clamp(50px, 28%, 140px); height: 24px; }
+      .f-front { top: 24px; height: auto; bottom: 0; }
+      .folder-name { font-size: 13px; }
+      .folder-sub  { font-size: 10px; }
+      .folder-divider { display: none; }
+      .finder {
+        width: calc(100vw - 16px);
+        top: 58px;
+        left: 8px;
+        transform: none;
+        max-height: calc(100vh - 70px);
+      }
+    }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+  <!-- TICKER -->
+  <div class="ticker">
+    <div class="ticker-track" id="ticker-track"></div>
+  </div>
+
+  <!-- MENUBAR -->
+  <div class="menubar">
+    <div class="menubar-left">
+      <img src="logo-no-text.svg" alt="project 66" class="menubar-logo" style="height:11px;" />
+      <div class="menubar-nav">
+        <span onclick="openFinder('calendar')">Calendar</span>
+        <span onclick="openFinder('contact')">Contact Us</span>
+        <span onclick="openFinder('about')">About</span>
+      </div>
+    </div>
+    <span class="menubar-time" id="clock"></span>
+  </div>
+
+  <!-- DESKTOP -->
+  <div class="desktop">
+
+    <!-- Large 66 logo — eyes track folder hover -->
+    <div class="desktop-logo">
+      <svg id="logo-large" viewBox="42 8 17 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M43.134 14.53C43.134 14.978 43.2273 15.3747 43.414 15.72C43.61 16.056 43.8713 16.322 44.198 16.518C44.534 16.714 44.912 16.812 45.332 16.812C45.752 16.812 46.1253 16.714 46.452 16.518C46.788 16.322 47.0493 16.056 47.236 15.72C47.432 15.3747 47.53 14.978 47.53 14.53C47.53 14.082 47.432 13.6853 47.236 13.34C47.0493 12.9853 46.788 12.71 46.452 12.514C46.1253 12.318 45.752 12.22 45.332 12.22C44.912 12.22 44.534 12.318 44.198 12.514C43.8713 12.71 43.61 12.9853 43.414 13.34C43.2273 13.6853 43.134 14.082 43.134 14.53ZM45.388 9H46.886L44.352 11.996L44.268 11.926C44.4547 11.6927 44.6693 11.5387 44.912 11.464C45.164 11.3893 45.4487 11.352 45.766 11.352C46.1673 11.352 46.5407 11.4313 46.886 11.59C47.2407 11.7487 47.5487 11.9727 47.81 12.262C48.0807 12.5513 48.2907 12.892 48.44 13.284C48.5893 13.6667 48.664 14.082 48.664 14.53C48.664 15.202 48.5147 15.79 48.216 16.294C47.9267 16.798 47.53 17.19 47.026 17.47C46.5313 17.75 45.9667 17.89 45.332 17.89C44.7067 17.89 44.142 17.75 43.638 17.47C43.134 17.19 42.7327 16.798 42.434 16.294C42.1447 15.79 42 15.202 42 14.53C42 14.1287 42.056 13.7553 42.168 13.41C42.28 13.0647 42.4293 12.7613 42.616 12.5L45.388 9Z" fill="black"/>
+        <path d="M51.2004 14.53C51.2004 14.978 51.2937 15.3747 51.4804 15.72C51.6764 16.056 51.9377 16.322 52.2644 16.518C52.6004 16.714 52.9784 16.812 53.3984 16.812C53.8184 16.812 54.1917 16.714 54.5184 16.518C54.8544 16.322 55.1157 16.056 55.3024 15.72C55.4984 15.3747 55.5964 14.978 55.5964 14.53C55.5964 14.082 55.4984 13.6853 55.3024 13.34C55.1157 12.9853 54.8544 12.71 54.5184 12.514C54.1917 12.318 53.8184 12.22 53.3984 12.22C52.9784 12.22 52.6004 12.318 52.2644 12.514C51.9377 12.71 51.6764 12.9853 51.4804 13.34C51.2937 13.6853 51.2004 14.082 51.2004 14.53ZM53.0204 9.19272H54.5184L52.4184 11.996L52.3344 11.926C52.5211 11.6927 52.7357 11.5387 52.9784 11.464C53.2304 11.3893 53.5151 11.352 53.8324 11.352C54.2337 11.352 54.6071 11.4313 54.9524 11.59C55.3071 11.7487 55.6151 11.9727 55.8764 12.262C56.1471 12.5513 56.3571 12.892 56.5064 13.284C56.6557 13.6667 56.7304 14.082 56.7304 14.53C56.7304 15.202 56.5811 15.79 56.2824 16.294C55.9931 16.798 55.5964 17.19 55.0924 17.47C54.5977 17.75 54.0331 17.89 53.3984 17.89C52.7731 17.89 52.2084 17.75 51.7044 17.47C51.2004 17.19 50.7991 16.798 50.5004 16.294C50.2111 15.79 50.0664 15.202 50.0664 14.53C50.0664 14.1287 50.1224 13.7553 50.2344 13.41C50.3464 13.0647 50.4957 12.7613 50.6824 12.5L53.0204 9.19272Z" fill="black"/>
+        <path d="M47 19H51" stroke="black" stroke-width="0.7"/>
+        <circle id="eye-left"  cx="44.4" cy="15" r="2.0" fill="black"/>
+        <circle id="eye-right" cx="54.4" cy="14" r="2.0" fill="black"/>
+      </svg>
+    </div>
+
+    <!-- Folders row -->
+    <div class="desktop-folders">
+
+      <div class="folder folder-aroma" id="folder-aroma" onclick="openFinder('aroma')">
+        <div class="folder-shell">
+          <div class="f-back"></div>
+          <div class="f-tab"></div>
+          <div class="f-front">
+            <img src="images/aroma001.png" alt="Aroma" />
+            <div class="f-label-overlay"><span>Aroma</span></div>
+          </div>
+        </div>
+        <div class="folder-name">Aroma</div>
+        <div class="folder-sub">001 upcoming</div>
+      </div>
+
+      <div class="folder folder-etch" id="folder-etch" onclick="openFinder('etch')">
+        <div class="folder-shell">
+          <div class="f-back"></div>
+          <div class="f-tab"></div>
+          <div class="f-front">
+            <div class="f-front-placeholder" style="background:#888;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5">
+                <path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+              </svg>
+            </div>
+            <div class="f-label-overlay"><span>Etch</span></div>
+          </div>
+        </div>
+        <div class="folder-name">Etch</div>
+        <div class="folder-sub">001 coming soon</div>
+      </div>
+
+      <div class="folder-placeholder"></div>
+
+    </div>
+  </div>
+
+  <!-- OVERLAY -->
+  <div class="overlay" id="overlay" onclick="closeAll()"></div>
+
+  <!-- ── FINDER: AROMA ── -->
+  <div class="finder" id="finder-aroma">
+    <div class="finder-titlebar">
+      <div class="wdot red" onclick="closeAll()"></div>
+      <div class="wdot yellow"></div>
+      <div class="wdot green"></div>
+      <div class="finder-title" id="aroma-finder-title">Aroma 001 — lullaby</div>
+    </div>
+    <div class="finder-body">
+      <div class="sidebar" id="aroma-sidebar">
+        <div class="sb-section">Upcoming</div>
+        <div class="sb-item active" onclick="showAromaEvent('aroma001')">
+          <div class="sb-dot" style="background:#c8b89a;"></div>
+          001 — lullaby
+          <span class="sb-badge upcoming">soon</span>
+        </div>
+        <div class="sb-section">Past</div>
+        <div class="sb-item" style="opacity:0.35; pointer-events:none; cursor:default;">
+          <div class="sb-dot" style="background:#ccc;"></div>
+          — empty —
+        </div>
+      </div>
+      <div class="finder-content" id="aroma-content">
+        <!-- filled by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FINDER: ETCH ── -->
+  <div class="finder" id="finder-etch">
+    <div class="finder-titlebar">
+      <div class="wdot red" onclick="closeAll()"></div>
+      <div class="wdot yellow"></div>
+      <div class="wdot green"></div>
+      <div class="finder-title">Etch 001 — Copper Pendant</div>
+    </div>
+    <div class="finder-body">
+      <div class="sidebar">
+        <div class="sb-section">Upcoming</div>
+        <div class="sb-item active">
+          <div class="sb-dot" style="background:#a8b0b8;"></div>
+          001 — TBA
+          <span class="sb-badge upcoming" style="background:#e8f0d8;color:#2a4a1a;">soon</span>
+        </div>
+        <div class="sb-section">Past</div>
+        <div class="sb-item" style="opacity:0.35; pointer-events:none;">
+          <div class="sb-dot" style="background:#ccc;"></div>
+          — empty —
+        </div>
+      </div>
+      <div class="finder-content">
+        <div class="fc-hero" style="background:#8a9aa4;">
+          <div class="fc-hero-placeholder">photo coming soon</div>
+          <div class="fc-status-badge badge-soon">Coming Soon</div>
+        </div>
+        <div class="fc-body">
+          <div class="fc-series">Etch series · No. 001</div>
+          <div class="fc-title">Copper Pendant Etching</div>
+          <div class="info-row"><span class="info-label">Sponsor</span><span class="info-val"><span class="inline-badge badge-tbd">Open</span></span></div>
+          <div class="info-row"><span class="info-label">Ticket</span><span class="info-val">$66 · free w/ sponsor</span></div>
+          <div class="info-row"><span class="info-label">Date</span><span class="info-val">TBD</span></div>
+          <div class="info-row"><span class="info-label">Location</span><span class="info-val">New York, NY</span></div>
+          <a href="#" class="rsvp-btn disabled">Waitlist opening soon →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FINDER: CONNECTS ── -->
+  <div class="finder" id="finder-connects">
+    <div class="finder-titlebar">
+      <div class="wdot red" onclick="closeAll()"></div>
+      <div class="wdot yellow"></div>
+      <div class="wdot green"></div>
+      <div class="finder-title">Connects</div>
+    </div>
+    <div class="finder-body">
+      <div class="sidebar">
+        <div class="sb-section">People</div>
+        <div class="sb-item active">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          Team
+        </div>
+        <div class="sb-item" style="opacity:0.5;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="9" width="18" height="12" rx="2"/><path d="M8 9V6a4 4 0 018 0v3"/></svg>
+          Sponsors
+        </div>
+      </div>
+      <div class="finder-content">
+        <div class="fc-body" style="padding-top: 18px;">
+          <div class="connect-card">
+            <div>
+              <div class="connect-name">Founder</div>
+              <div class="connect-role">project 66 · New York</div>
+            </div>
+            <span class="inline-badge badge-org">organizer</span>
+          </div>
+          <div class="connect-card">
+            <div>
+              <div class="connect-name">lullaby</div>
+              <div class="connect-role">Sponsor · Aroma 001</div>
+            </div>
+            <span class="inline-badge badge-free">sponsor</span>
+          </div>
+          <div class="connect-card" style="opacity:0.4;">
+            <div>
+              <div class="connect-name">Your brand</div>
+              <div class="connect-role">Sponsor · next event</div>
+            </div>
+            <span class="inline-badge badge-tbd">open</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FINDER: CALENDAR ── -->
+  <div class="finder" id="finder-calendar">
+    <div class="finder-titlebar">
+      <div class="wdot red" onclick="closeAll()"></div>
+      <div class="wdot yellow"></div>
+      <div class="wdot green"></div>
+      <div class="finder-title" id="cal-title-bar">Calendar</div>
+    </div>
+    <div class="finder-body" style="flex-direction: column; overflow: hidden;">
+      <div class="cal-grid-header">
+        <button class="cal-nav-btn" onclick="calNav(-1)">‹</button>
+        <span class="cal-month-label" id="cal-month-label"></span>
+        <button class="cal-nav-btn" onclick="calNav(1)">›</button>
+      </div>
+      <div class="cal-days-header">
+        <div class="cal-day-name">SU</div>
+        <div class="cal-day-name">MO</div>
+        <div class="cal-day-name">TU</div>
+        <div class="cal-day-name">WE</div>
+        <div class="cal-day-name">TH</div>
+        <div class="cal-day-name">FR</div>
+        <div class="cal-day-name">SA</div>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div class="cal-detail-panel" id="cal-detail-panel"></div>
+    </div>
+  </div>
+
+  <!-- ── FINDER: CONTACT ── -->
+  <div class="finder" id="finder-contact">
+    <div class="finder-titlebar">
+      <div class="wdot red" onclick="closeAll()"></div>
+      <div class="wdot yellow"></div>
+      <div class="wdot green"></div>
+      <div class="finder-title">Contact Us</div>
+    </div>
+    <div class="finder-body">
+      <div class="sidebar">
+        <div class="sb-section">Reach Us</div>
+        <div class="sb-item active">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>
+          Email
+        </div>
+        <div class="sb-item">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.07 12a19.8 19.8 0 01-3-8.59A2 2 0 013.08 1.5h3a2 2 0 012 1.72c.13 1 .37 1.98.72 2.93a2 2 0 01-.45 2.11L7.09 9.91a16 16 0 006 6l1.65-1.65a2 2 0 012.12-.45c.95.35 1.93.6 2.93.72a2 2 0 011.72 2.04z"/></svg>
+          Instagram
+        </div>
+      </div>
+      <div class="finder-content">
+        <div class="fc-body" style="padding-top: 22px;">
+          <div class="fc-series" style="margin-bottom:12px;">Get in touch</div>
+          <div class="connect-card">
+            <div>
+              <div class="connect-name">General Inquiries</div>
+              <div class="connect-role">hello@project66.co</div>
+            </div>
+            <span class="inline-badge badge-org">email</span>
+          </div>
+          <div class="connect-card">
+            <div>
+              <div class="connect-name">Sponsorship</div>
+              <div class="connect-role">sponsor@project66.co</div>
+            </div>
+            <span class="inline-badge badge-sponsor">sponsor</span>
+          </div>
+          <div class="connect-card">
+            <div>
+              <div class="connect-name">Instagram</div>
+              <div class="connect-role">@project66.nyc</div>
+            </div>
+            <span class="inline-badge badge-org">social</span>
+          </div>
+          <div class="connect-card">
+            <div>
+              <div class="connect-name">小红书</div>
+              <div class="connect-role">project 66</div>
+            </div>
+            <span class="inline-badge badge-org">social</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FINDER: ABOUT ── -->
+  <div class="finder" id="finder-about">
+    <div class="finder-titlebar">
+      <div class="wdot red" onclick="closeAll()"></div>
+      <div class="wdot yellow"></div>
+      <div class="wdot green"></div>
+      <div class="finder-title">About — project 66</div>
+    </div>
+    <div class="finder-body">
+      <div class="sidebar">
+        <div class="sb-section">Info</div>
+        <div class="sb-item active">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Story
+        </div>
+        <div class="sb-item" style="opacity:0.5;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          Team
+        </div>
+      </div>
+      <div class="finder-content">
+        <div class="fc-hero" style="background: linear-gradient(135deg, #222222, #666666);">
+          <div class="fc-hero-placeholder" style="flex-direction:column; gap:6px;">
+            <span style="font-family: var(--font-serif); font-size:1.4rem; color:rgba(255,255,255,0.9); letter-spacing:-0.01em;">project 66</span>
+            <span style="font-size:9px; letter-spacing:0.18em; color:rgba(255,255,255,0.55);">NEW YORK</span>
+          </div>
+        </div>
+        <div class="fc-body">
+          <div class="fc-series">Est. 2026 · New York, NY</div>
+          <div class="fc-title">A community for curious makers.</div>
+          <div class="info-row" style="display:block; padding:10px 0; border:none;">
+            <span class="info-label" style="display:block; line-height:1.9; font-size:11px; color:var(--text); letter-spacing:0.03em;">
+              project 66 hosts intimate, hands-on experiences — from scent workshops to copper etching — where people slow down, make something real, and connect with others who care about craft.
+            </span>
+          </div>
+          <div class="info-row"><span class="info-label">Series</span><span class="info-val">Aroma · Etch</span></div>
+          <div class="info-row"><span class="info-label">Location</span><span class="info-val">New York, NY</span></div>
+          <div class="info-row"><span class="info-label">Ticket</span><span class="info-val">$66 · free w/ sponsor</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // ── DATA ──
+  const EVENTS = {
+    aroma001: {
+      series: 'Aroma series · No. 001',
+      title: 'Scented Sachet Workshop',
+      sponsor: 'lullaby',
+      ticket: 'Free',
+      ticketBadge: 'badge-free',
+      date: 'May 24, 2026',
+      time: '4:00 PM',
+      location: 'New York, NY',
+      status: 'Upcoming',
+      statusBadge: 'badge-upcoming',
+      rsvpLabel: 'RSVP — Free Admission →',
+      rsvpHref: '#',  // ← replace with actual link
+      image: 'images/aroma001.png',
+      finderTitle: 'Aroma 001 — lullaby',
+    }
+  };
+
+  // ── TICKER ──
+  const tickerItems = [
+    ['Aroma 001 × lullaby', 'May 24 · 4PM · New York · <span class="hi">Free admission</span>'],
+    ['Post on 小红书 or Instagram · hit 50+ likes', '<span class="hi">Free ticket to next event</span>'],
+    ['Bring a friend', '<span class="hi">20% off for both</span>'],
+    ['Etch 001 coming soon', 'Copper pendant etching · <span class="hi">Sponsor slots open</span>'],
+  ];
+  const track = document.getElementById('ticker-track');
+  const html = tickerItems.map(([a,b]) =>
+    `<span class="ticker-item">${a}<span class="sep">·</span>${b}</span>`
+  ).join('');
+  track.innerHTML = html + html; // duplicate for seamless loop
+
+  // ── CLOCK ──
+  function tick() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2,'0');
+    const m = String(now.getMinutes()).padStart(2,'0');
+    document.getElementById('clock').textContent = `${h}:${m}`;
+  }
+  tick();
+  setInterval(tick, 10000);
+
+  // ── FINDER OPEN/CLOSE ──
+  function openFinder(id) {
+    document.querySelectorAll('.finder').forEach(f => f.classList.remove('open'));
+    document.getElementById('overlay').classList.add('open');
+    document.getElementById('finder-' + id).classList.add('open');
+    if (id === 'aroma') showAromaEvent('aroma001');
+    if (id === 'calendar') renderCalendar();
+  }
+
+  // ── CALENDAR ──
+  const CAL_EVENTS = {
+    '2026-5-24': {
+      series: 'Aroma No. 001 × lullaby',
+      title: 'Scented Sachet Workshop',
+      time: '4:00 PM',
+      location: 'New York, NY',
+      ticket: 'Free',
+      rsvpLabel: 'RSVP — Free →',
+      rsvpHref: '#',
+    }
+  };
+
+  const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  let calYear = 2026, calMonth = 4; // May 2026
+
+  function renderCalendar() {
+    const label = `${MONTH_NAMES[calMonth]} ${calYear}`;
+    document.getElementById('cal-month-label').textContent = label;
+    document.getElementById('cal-title-bar').textContent = `Calendar — ${label}`;
+
+    const today = new Date();
+    const firstDay = new Date(calYear, calMonth, 1).getDay();
+    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+
+    let html = '';
+    for (let i = 0; i < firstDay; i++) html += '<div class="cal-cell-empty"></div>';
+    for (let d = 1; d <= daysInMonth; d++) {
+      const key = `${calYear}-${calMonth + 1}-${d}`;
+      const ev = CAL_EVENTS[key];
+      const isToday = today.getFullYear() === calYear && today.getMonth() === calMonth && today.getDate() === d;
+      html += `<div class="cal-cell${ev ? ' has-event' : ''}${isToday ? ' today' : ''}"${ev ? ` onclick="showCalEvent('${key}')"` : ''}>`;
+      html += `<div class="cal-cell-num">${d}</div>`;
+      if (ev) html += `<div class="cal-event-chip">${ev.title}</div>`;
+      html += '</div>';
+    }
+    document.getElementById('cal-grid').innerHTML = html;
+    document.getElementById('cal-detail-panel').classList.remove('open');
+  }
+
+  function calNav(dir) {
+    calMonth += dir;
+    if (calMonth > 11) { calMonth = 0; calYear++; }
+    if (calMonth < 0)  { calMonth = 11; calYear--; }
+    renderCalendar();
+  }
+
+  function showCalEvent(key) {
+    const ev = CAL_EVENTS[key];
+    if (!ev) return;
+    document.querySelectorAll('.cal-cell').forEach(c => c.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+    const [y, m, d] = key.split('-');
+    const dateStr = `${MONTH_SHORT[+m - 1]} ${d}, ${y}`;
+    const panel = document.getElementById('cal-detail-panel');
+    panel.innerHTML = `
+      <div class="cal-detail-text">
+        <div class="cal-detail-eyebrow">${ev.series}</div>
+        <div class="cal-detail-title">${ev.title}</div>
+        <div class="cal-detail-meta">${dateStr} · ${ev.time} · ${ev.location} · ${ev.ticket}</div>
+      </div>
+      <a href="${ev.rsvpHref}" class="rsvp-btn" style="width:auto;padding:9px 16px;margin:0;white-space:nowrap;flex-shrink:0;" target="_blank">${ev.rsvpLabel}</a>
+    `;
+    panel.classList.add('open');
+  }
+
+  function closeAll() {
+    document.querySelectorAll('.finder').forEach(f => f.classList.remove('open'));
+    document.getElementById('overlay').classList.remove('open');
+  }
+
+  // ── AROMA EVENT RENDERER ──
+  function showAromaEvent(key) {
+    const e = EVENTS[key];
+    if (!e) return;
+
+    document.getElementById('aroma-finder-title').textContent = e.finderTitle;
+
+    // update sidebar active state
+    document.querySelectorAll('#aroma-sidebar .sb-item').forEach(el => el.classList.remove('active'));
+    const items = document.querySelectorAll('#aroma-sidebar .sb-item');
+    items[0].classList.add('active');
+
+    const content = document.getElementById('aroma-content');
+    content.innerHTML = `
+      <div class="fc-hero">
+        <img src="${e.image}" alt="${e.title}" />
+        <div class="fc-status-badge ${e.statusBadge}">${e.status}</div>
+      </div>
+      <div class="fc-body">
+        <div class="fc-series">${e.series}</div>
+        <div class="fc-title">${e.title}</div>
+        <div class="info-row">
+          <span class="info-label">Sponsor</span>
+          <span class="info-val">${e.sponsor}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Ticket</span>
+          <span class="info-val"><span class="inline-badge ${e.ticketBadge}">${e.ticket}</span></span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Date</span>
+          <span class="info-val">${e.date}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Time</span>
+          <span class="info-val">${e.time}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Location</span>
+          <span class="info-val">${e.location}</span>
+        </div>
+        <a href="${e.rsvpHref}" class="rsvp-btn" target="_blank">${e.rsvpLabel}</a>
+      </div>
+    `;
+  }
+  // ── EYE TRACKING ──
+  (function () {
+    // Geometric center of each "6" counter (the circular hole in each numeral)
+    const LC = { x: 45.332, y: 14.516 }; // left counter center
+    const RC = { x: 53.398, y: 14.516 }; // right counter center
+
+    // Resting positions — divergent gaze matching the original logo
+    const EL_REST = { x: 44.4, y: 15 };
+    const ER_REST = { x: 54.4, y: 14 };
+
+    // How far each pupil moves from its counter center when tracking
+    const TRACK = 0.72;
+
+    function setEye(id, x, y) {
+      const el = document.getElementById(id);
+      if (el) { el.setAttribute('cx', x); el.setAttribute('cy', y); }
+    }
+
+    function lookAt(folderEl) {
+      const logo = document.getElementById('logo-large');
+      const lb   = logo.getBoundingClientRect();
+      const fb   = folderEl.getBoundingClientRect();
+      // Direction from logo centre → folder centre
+      const dx   = (fb.left + fb.width  / 2) - (lb.left + lb.width  / 2);
+      const dy   = (fb.top  + fb.height / 2) - (lb.top  + lb.height / 2);
+      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+      const ox   = (dx / dist) * TRACK;
+      const oy   = (dy / dist) * TRACK;
+      // Both eyes move from their own counter centre → both look the same direction
+      setEye('eye-left',  LC.x + ox, LC.y + oy);
+      setEye('eye-right', RC.x + ox, RC.y + oy);
+    }
+
+    function resetEyes() {
+      setEye('eye-left',  EL_REST.x, EL_REST.y);
+      setEye('eye-right', ER_REST.x, ER_REST.y);
+    }
+
+    ['folder-aroma','folder-etch'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('mouseenter', () => lookAt(el));
+      el.addEventListener('mouseleave', resetEyes);
+    });
+  })();
+
+  // ── SCROLL-HIDE NAV ──
+  (function () {
+    let lastY = 0;
+    const nav = document.querySelector('.menubar');
+    window.addEventListener('scroll', function () {
+      const y = window.scrollY;
+      if (y > lastY && y > 40) {
+        nav.classList.add('nav-hidden');
+      } else {
+        nav.classList.remove('nav-hidden');
+      }
+      lastY = y;
+    }, { passive: true });
+  })();
+</script>
+</body>
+</html>
